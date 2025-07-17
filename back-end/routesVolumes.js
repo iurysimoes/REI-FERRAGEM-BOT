@@ -13,9 +13,9 @@ router.post('/validar-volume', async (req, res) => {
     // Verifica se o código pertence ao pedido
     const selectSql = `
       SELECT COUNT(*) AS QTD
-      FROM VOLUMES_PEDIDO
-      WHERE ID_PEDIDO = :idPedido
-      AND CODIGO_BARRAS = :codigoBarras
+      FROM volume_conferencia c
+     WHERE c.pedido_saida_id       = :idPedido
+       AND c.volume_conferencia_id = :codigoBarras
     `;
 
     const result = await query(selectSql, [idPedido, codigoBarras]);
@@ -26,10 +26,10 @@ router.post('/validar-volume', async (req, res) => {
 
     // Atualiza para marcar como conferido
     const updateSql = `
-      UPDATE VOLUMES_PEDIDO
-      SET VOLUME_CONFERIDO = 'Sim'
-      WHERE ID_PEDIDO = :idPedido
-      AND CODIGO_BARRAS = :codigoBarras
+      UPDATE volume_conferencia
+         SET volc_confirma_cliente_zap = 'Sim'
+       WHERE pedido_saida_id           = :idPedido
+         AND volume_conferencia_id     = :codigoBarras
     `;
 
     await query(updateSql, [idPedido, codigoBarras], { autoCommit: true }); // importante o commit
