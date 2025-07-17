@@ -111,8 +111,13 @@ async function chegou(client, msg) {
 
       return client.sendMessage(
         msg.from,
-        `📲 *Iniciar leitura dos volumes:*\n\nClique no link abaixo para abrir o leitor de códigos de barras:\n\n👉 ${url}`
+        `📦 Beleza! Agora clique no link abaixo para escanear os volumes do pedido.\n\n` +
+        `👉 https://rei-ferragem-bot.vercel.app/?userId=${userId}&idPedido=${idPedido}\n\n` +
+        `📸 Quando terminar de escanear, clique no botão "Finalizar Escaneamento" que vai te redirecionar pro WhatsApp.`
       );
+      
+  
+
     } catch (err) {
       console.error('[chegou] Erro ao validar pedido:', err);
       return client.sendMessage(msg.from, '⚠️ Erro ao verificar o número do pedido. Tente novamente mais tarde.');
