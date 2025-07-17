@@ -1,0 +1,20 @@
+# Ignora a pasta de dependências
+node_modules/
+.wwebjs_auth
+.wwebjs_cache
+
+# Logs
+*.log
+npm-debug.log*
+
+# Variáveis de ambiente
+.env
+
+# Cache do sistema operacional
+.DS_Store
+
+# Pasta do VSCode
+.vscode/
+
+# Arquivos temporários
+*.tmp
