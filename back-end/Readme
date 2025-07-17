@@ -1,0 +1,92 @@
+# 🤖 Projeto WhatsApp Bot - REI FERRAGEM
+
+Bot de atendimento automatizado via WhatsApp, usando a API [whatsapp-web.js](https://wwebjs.dev/) e banco de dados Oracle.
+
+---
+
+## 📁 Estrutura do Projeto
+```
+back-end/
+├── config/
+│   └── db.js                    # Conexão com Oracle
+├── controllers/
+│   ├── controllerAntecipado.js
+│   ├── controllerCadastro.js
+│   ├── controllerFinanceiro.js
+│   ├── controllerPedido.js
+│   └── controllerRedirecionamento.js
+├── services/
+│   └── atendimentoService.js   # Busca o número do atendente por setor
+├── router.js                   # Roteia mensagens recebidas
+└── index.js                    # Início do bot com whatsapp-web.js
+```
+
+---
+
+## ⚙️ Pré-requisitos
+
+- Node.js 18+
+- Oracle Client instalado (ou Instant Client)
+- Banco de dados Oracle ativo com a tabela `atendentes`
+- Dependências:
+  ```bash
+  npm install whatsapp-web.js oracledb qrcode-terminal
+  ```
+
+---
+
+## 🗃️ Exemplo da Tabela `atendentes`
+
+```sql
+CREATE TABLE atendentes (
+  setor VARCHAR2(50),
+  telefone_whatsapp VARCHAR2(20)
+);
+
+INSERT INTO atendentes (setor, telefone_whatsapp) VALUES ('antecipado', '11999999999');
+-- Faça isso para todos os setores (cadastro, posvenda, danificado, etc)
+```
+
+---
+
+## ▶️ Iniciando o bot
+
+1. Configure seu arquivo `db.js` com as credenciais do seu banco Oracle.
+2. Inicie o bot:
+   ```bash
+   node index.js
+   ```
+3. Leia o QR Code no terminal com o WhatsApp Web do número que será o BOT.
+
+---
+
+## 🧠 Comandos Suportados pelo Bot
+
+- `Pedido` → Consulta de andamento
+- `Pedido Chegou` → Opções de volume recebido
+- `Antecipado` → Envio de comprovante
+- `Financeiro` → Segunda via, renegociação, atendente
+- `Cadastro Cliente` → Envio dos dados para cadastro
+- `Pós-venda`, `Volume Danificado`, `Volume Faltou`, `Outros Assuntos` → Redirecionamento automático
+
+---
+
+## 🧱 Estrutura de Desenvolvimento
+- Separação clara entre:
+  - Controllers (fluxos principais)
+  - Services (lógica de banco e serviços)
+  - Config (conexão Oracle)
+- Código modular e fácil de escalar.
+
+---
+
+## 📌 Dica de Produção
+- Use o [PM2](https://pm2.keymetrics.io/) pra rodar o bot em segundo plano:
+```bash
+npm install -g pm2
+pm run start-bot
+```
+
+---
+
+Se quiser posso gerar também um `.env` e te ajudar a deixar isso pronto pra produção 😉

@@ -1,0 +1,15 @@
+{
+  "name": "whatsapp-bot-rei-ferragem",
+  "version": "1.0.0",
+  "description": "Chatbot WhatsApp com atendimento automatizado e integração com Oracle.",
+  "main": "back-end/index.js",
+  "scripts": {
+    "start": "node back-end/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "oracledb": "^6.3.0",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.23.0"
+  }
+}
