@@ -9,21 +9,26 @@ router.post('/validar-volume', async (req, res) => {
   if (!idPedido || !codigoBarras) {
     return res.status(400).json({ sucesso: false, mensagem: 'Pedido e código de barras são obrigatórios.' });
   }
-   //idpedido abaixo esta passando nr no pedido...??
+  
   try {
     //pegando pedido_saida_id somente para usar abaixo
-    const pedidoResult = await connection.execute(
-      `SELECT ps.pedido_saida_id 
+    const pedidoResult = 
+      `SELECT ps.pedido_saida_id as id 
          FROM pedido_saida ps 
-        WHERE ps.Pdsd_Nr_Pedido = :idPedido`,
-      { idPedido }
-    );
-    const pedido_saida_id = pedidoResult.rows[0][0];
+        WHERE ps.Pdsd_Nr_Pedido = :idPedido`;
+      
+    const Presult = await db.query(Presult, [idPedido, codigoBarras]);
+    
+    if (!Presult.rows || Presult.rows.length === 0) {
+      return res.status(404).json({ sucesso: false, mensagem: 'Pedido não encontrado.' });
+    }
+
+    const pedido_saida_id = Presult.rows[0].ID ?? Presult.rows[0]['ID']; // depende do case do Oracle
     // Verifica se o código pertence ao pedido
     const selectSql = `
       SELECT COUNT(*) AS QTD
       FROM volume_conferencia c
-     WHERE ps.pedido_saida_id       = :pedido_saida_id
+     WHERE c.pedido_saida_id       = :pedido_saida_id
        AND c.volume_conferencia_id = :codigoBarras
     `;
 
