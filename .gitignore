@@ -1,7 +1,10 @@
 # Ignora a pasta de dependências
 node_modules/
-.wwebjs_auth
-.wwebjs_cache
+.wwebjs_auth/
+.wwebjs_cache/
+
+*.log
+
 
 # Logs
 *.log
