@@ -17,13 +17,14 @@ router.post('/validar-volume', async (req, res) => {
          FROM pedido_saida ps 
         WHERE ps.Pdsd_Nr_Pedido = :idPedido`;
       
-    const Presult = await db.query(Presult, [idPedido, codigoBarras]);
+    const Presult = await db.query(pedidoResult, [idPedido]);
     
     if (!Presult.rows || Presult.rows.length === 0) {
       return res.status(404).json({ sucesso: false, mensagem: 'Pedido não encontrado.' });
     }
-
-    const pedido_saida_id = Presult.rows[0].ID ?? Presult.rows[0]['ID']; // depende do case do Oracle
+ 
+    const pedido_saida_id = Presult.rows[0].id || Presult.rows[0].ID;
+   
     // Verifica se o código pertence ao pedido
     const selectSql = `
       SELECT COUNT(*) AS QTD
