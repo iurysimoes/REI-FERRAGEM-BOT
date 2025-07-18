@@ -91,7 +91,7 @@
   }
   </style>
   <button id="finish-button">Finalizar Escaneamento</button>
-
+  <div id="check-sucesso" style="display: none; font-size: 100px; color: green;">✅</div>
   <script>
     const codeReader = new ZXing.BrowserBarcodeReader();
 const urlParams = new URLSearchParams(window.location.search);
@@ -162,7 +162,18 @@ async function startScanner() {
             `${data.mensagem} (Códigos lidos: ${codigosLidos.length})`,
             data.sucesso ? 'success' : 'error'
           );
+          // Se todos os volumes foram conferidos, exibe mensagem e oculta scanner
+          if (data.todosVolumesConferidos) {
+            scanning = false;
+            codeReader.reset();
 
+            document.getElementById('video').style.display = 'none'; // oculta a câmera
+            document.querySelector('h2').style.display = 'none';     // oculta o título
+            finishButton.style.display = 'block';                    // mostra botão finalizar
+            document.getElementById('check-sucesso').style.display = 'block'; // mostra o check ✅
+
+            displayMessage('✅ Todos os volumes foram conferidos!', 'success');
+          }
           // Continua escaneando, mesmo que maisVolumes seja false
           // O usuário decidirá quando parar usando o botão de finalizar
 
@@ -203,5 +214,6 @@ finishButton.addEventListener('click', () => {
 // Inicia o scanner quando a página é carregada
 window.onload = startScanner;
   </script>
+  <div id="check-sucesso" style="display: none; font-size: 100px; color: green;">✅</div>
 </body>
 </html>

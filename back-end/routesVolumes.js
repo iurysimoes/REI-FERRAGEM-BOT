@@ -51,6 +51,26 @@ router.post('/validar-volume', async (req, res) => {
     await db.query(updateSql, [pedido_saida_id, codigoBarras], { autoCommit: true }); // importante o commit
 
     res.json({ sucesso: true, mensagem: `Volume com código ${codigoBarras} marcado como conferido.` });
+
+    // Verifica se todos os volumes já foram conferidos
+    const verificaSql = `
+      SELECT COUNT(*) AS QTD
+      FROM volume_conferencia
+      WHERE pedido_saida_id = :pedido_saida_id
+        AND volc_confirma_cliente_zap IS NULL
+    `;
+
+    const verificaResult = await db.query(verificaSql, [pedido_saida_id]);
+    const aindaTemVolumes = verificaResult.rows[0].QTD > 0;
+
+    if (!aindaTemVolumes) {
+      return res.json({
+        sucesso: true,
+        mensagem: `Todos os volumes do pedido ${idPedido} foram conferidos.`,
+        todosVolumesConferidos: true
+      });
+    }
+
   } catch (error) {
     console.error('Erro na validação do volume:', error);
     res.status(500).json({ sucesso: false, mensagem: 'Erro ao validar o volume.' });
