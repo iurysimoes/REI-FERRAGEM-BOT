@@ -5,7 +5,7 @@ const controllerFinanceiro = require('./controllers/controllerFinanceiro');
 const controllerAntecipado = require('./controllers/controllerAntecipado');
 const controllerCadastro = require('./controllers/controllerCadastro');
 const { redirecionar } = require('./controllers/controllerRedirecionamento');
-const { getStep, setStep } = require('./back-end/flowControl'); // Corrigido: usar await
+const { getStep, setStep } = require('./flowcontrol'); // Corrigido: usar await
 const NUMERO_FIXO = '556284315872';
 
 async function handleMessage(client, msg) {

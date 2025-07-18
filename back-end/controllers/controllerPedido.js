@@ -2,7 +2,9 @@
 
 const db = require('../database/db');
 const { getAtendente } = require('../services/atendimentoService');
-const { setStep, getStep, clearStep } = require('../flowControl');
+//const { setStep, getStep, clearStep } = require('../flowcontrol');
+const flowControl = require('../flowcontrol');
+
 
 async function iniciar(client, msg) {
   const userId = msg.author || msg.from;
@@ -57,11 +59,11 @@ async function iniciar(client, msg) {
 
 async function chegou(client, msg) {
   const userId = msg.from;
-  const etapa = await flowControl.getEtapa(userId);
+  const etapa = await flowControl.getStep(userId);
   const texto = msg.body.trim();
 
   if (!etapa) {
-    await flowControl.setEtapa(userId, 'chegou_menu');
+    await flowControl.setStep(userId, 'chegou_menu');
     return client.sendMessage(
       msg.from,
       `📦 *Pedido Chegou*\n\nEscolha uma opção:\n1️⃣ Ler código de barras dos volumes\n2️⃣ Informações de como prosseguir\n3️⃣ Falar com atendente`
@@ -70,12 +72,12 @@ async function chegou(client, msg) {
 
   if (etapa === 'chegou_menu') {
     if (texto === '1') {
-      await flowControl.setEtapa(userId, 'aguardando_numero_pedido_codigo');
+      await flowControl.setStep(userId, 'aguardando_numero_pedido_codigo');
       return client.sendMessage(msg.from, '🔢 Por favor, digite o número do pedido para iniciar a leitura dos volumes:');
     }
 
     if (texto === '2') {
-      await flowControl.resetEtapa(userId);
+      await flowControl.clearStep(userId);
       return client.sendMessage(
         msg.from,
         `ℹ️ *Como prosseguir com seu pedido:*\n\n- Verifique os volumes com o leitor de código de barras\n- Confirme os volumes recebidos\n- Em caso de divergência, selecione 'Falar com atendente'\n\nSe precisar de ajuda, digite *3*.`
@@ -83,7 +85,7 @@ async function chegou(client, msg) {
     }
 
     if (texto === '3') {
-      await flowControl.resetEtapa(userId);
+      await flowControl.clearStep(userId);
       return redirecionarAtendente(client, msg, 'pedidos');
     }
 
@@ -104,7 +106,7 @@ async function chegou(client, msg) {
         return client.sendMessage(msg.from, '❌ Pedido não encontrado. Digite novamente o número do pedido ou *voltar* para o menu.');
       }
 
-      await flowControl.resetEtapa(userId);
+      await flowControl.clearStep(userId);
 
       const baseUrl = 'https://seuservidor.com'; // Substituir pelo seu domínio real ou ngrok
       const url = `${baseUrl}/index.html?idPedido=${encodeURIComponent(numeroPedido)}&userId=${encodeURIComponent(userId)}`;
@@ -112,7 +114,7 @@ async function chegou(client, msg) {
       return client.sendMessage(
         msg.from,
         `📦 Beleza! Agora clique no link abaixo para escanear os volumes do pedido.\n\n` +
-        `👉 https://rei-ferragem-bot.vercel.app/?userId=${userId}&idPedido=${idPedido}\n\n` +
+        `👉 https://rei-ferragem-bot.vercel.app/?userId=${userId}&idPedido=${numeroPedido}\n\n` +
         `📸 Quando terminar de escanear, clique no botão "Finalizar Escaneamento" que vai te redirecionar pro WhatsApp.`
       );
       

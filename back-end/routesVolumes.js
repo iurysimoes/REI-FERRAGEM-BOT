@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { query } = require('../db'); // pega a query do seu db.js
+//const { query } = require('../database/db'); // pega a query do seu db.js
+const db = require('./database/db');
 
 router.post('/validar-volume', async (req, res) => {
   const { idPedido, codigoBarras, userId } = req.body;
@@ -18,7 +19,7 @@ router.post('/validar-volume', async (req, res) => {
        AND c.volume_conferencia_id = :codigoBarras
     `;
 
-    const result = await query(selectSql, [idPedido, codigoBarras]);
+    const result = await db.query(selectSql, [idPedido, codigoBarras]);
 
     if (result.rows[0].QTD === 0) {
       return res.json({ sucesso: false, mensagem: 'Código de barras não pertence a este pedido.' });
