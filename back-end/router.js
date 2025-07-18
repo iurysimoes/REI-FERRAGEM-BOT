@@ -5,7 +5,8 @@ const controllerFinanceiro = require('./controllers/controllerFinanceiro');
 const controllerAntecipado = require('./controllers/controllerAntecipado');
 const controllerCadastro = require('./controllers/controllerCadastro');
 const { redirecionar } = require('./controllers/controllerRedirecionamento');
-const { getStep, setStep } = require('./flowcontrol'); // Corrigido: usar await
+//const { getStep, setStep } = require('./flowcontrol'); // Corrigido: usar await
+const flowControl = require('./flowcontrol');
 const NUMERO_FIXO = '556284315872';
 
 async function handleMessage(client, msg) {
@@ -20,7 +21,7 @@ async function handleMessage(client, msg) {
   const userId = msg.author || msg.from;
   const text = msg.body?.toLowerCase().trim() || '';
 
-  const etapa = await getStep(userId); // Corrigido: await para funcionar corretamente
+  const etapa = await flowControl.getStep(userId); // Corrigido: await para funcionar corretamente
 
   console.log(`Mensagem do grupo "${chat.name}" - Usuário: ${userId} - Texto: "${text}"`);
 
@@ -29,19 +30,20 @@ async function handleMessage(client, msg) {
     return controllerPedido.chegou(client, msg); // fluxo múltiplas etapas do "Pedido Chegou"
   }
 
-  if (etapa === 'acompanhamento') {
+  if (etapa === 'acompanhamento' || etapa === 'AGUARDANDO_NUMERO')  {
     return controllerPedido.iniciar(client, msg);
   }
 
   // 🎯 Gatilhos de entrada (menus principais)
 
   if (text.includes('pedido chegou')) {
-    await setStep(userId, 'chegou_menu');
+    await flowControl.setStep(userId, 'chegou_menu');
     return controllerPedido.chegou(client, msg);
   }
 
   if (text.includes('pedido')) {
-    await setStep(userId, 'acompanhamento');
+    //await setStep(userId, 'acompanhamento');
+    await flowControl.clearStep(userId);
     return controllerPedido.iniciar(client, msg);
   }
 

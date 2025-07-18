@@ -11,8 +11,8 @@ async function iniciar(client, msg) {
   const etapa = await flowControl.getStep(userId);
   const texto = msg.body.trim();
 
-  //if (!etapa) {
-  if (etapa === 'acompanhamento'){
+  if (!etapa) {
+  //if (etapa === 'acompanhamento'){
     await client.sendMessage(msg.from, '📦 Digite o número do seu pedido ou *2* para falar com um atendente.');
     await flowControl.setStep(userId, 'AGUARDANDO_NUMERO');
     return;  // IMPORTANTE: interrompe aqui para não continuar o código
@@ -22,10 +22,10 @@ async function iniciar(client, msg) {
     await flowControl.clearStep(userId);
     return redirecionarAtendente(client, msg, 'pedidos'); // retorno da função aqui
   }
-
+   
   if (etapa === 'AGUARDANDO_NUMERO') {
     const numero = texto;
-
+    console.log(numero);
     try {
       const qr = await db.query(
         `SELECT ANP.ANPD_DATA,
