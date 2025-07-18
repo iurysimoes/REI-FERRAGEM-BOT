@@ -33,7 +33,7 @@ router.post('/validar-volume', async (req, res) => {
          AND volume_conferencia_id     = :codigoBarras
     `;
 
-    await query(updateSql, [idPedido, codigoBarras], { autoCommit: true }); // importante o commit
+    await db.query(updateSql, [idPedido, codigoBarras], { autoCommit: true }); // importante o commit
 
     res.json({ sucesso: true, mensagem: `Volume com código ${codigoBarras} marcado como conferido.` });
   } catch (error) {
