@@ -8,18 +8,19 @@ const flowControl = require('../flowcontrol');
 
 async function iniciar(client, msg) {
   const userId = msg.author || msg.from;
-  const etapa = getStep(userId);
+  const etapa = await flowControl.getStep(userId);
   const texto = msg.body.trim();
 
-  if (!etapa) {
+  //if (!etapa) {
+  if (etapa === 'acompanhamento'){
     await client.sendMessage(msg.from, '📦 Digite o número do seu pedido ou *2* para falar com um atendente.');
-    setStep(userId, 'AGUARDANDO_NUMERO');
-    return;
+    await flowControl.setStep(userId, 'AGUARDANDO_NUMERO');
+    return;  // IMPORTANTE: interrompe aqui para não continuar o código
   }
 
   if (etapa === 'AGUARDANDO_NUMERO' && texto === '2') {
-    clearStep(userId);
-    return redirecionarAtendente(client, msg, 'pedidos');
+    await flowControl.clearStep(userId);
+    return redirecionarAtendente(client, msg, 'pedidos'); // retorno da função aqui
   }
 
   if (etapa === 'AGUARDANDO_NUMERO') {
@@ -53,9 +54,10 @@ async function iniciar(client, msg) {
       await client.sendMessage(msg.from, '⚠️ Ocorreu um erro ao buscar o pedido. Tente novamente mais tarde.');
     }
 
-    return;
+    return;  // interrompe aqui
   }
 }
+
 
 async function chegou(client, msg) {
   const userId = msg.from;
