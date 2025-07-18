@@ -6,6 +6,7 @@ const cors = require('cors');
 const app = express();
 const path = require('path');
 const routesVolumes = require('./routesVolumes'); // ajusta o caminho conforme seu projeto
+const { verificarNovosPedidos } = require('./controllers/controllerNotificacoes');
 
 // ou, se quiser liberar só pra um domínio específico (mais seguro):
  app.use(cors({ origin: 'https://rei-ferragem-bot.vercel.app' }));
@@ -26,7 +27,15 @@ client.on('qr', (qr) => {
 });
 
 //client.on('qr', qr => console.log('QR RECEIVED', qr));
-client.on('ready', () => console.log('✅ WhatsApp Client pronto!'));
+//client.on('ready', () => console.log('✅ WhatsApp Client pronto!'));
+client.on('ready', () => {
+  console.log('✅ WhatsApp Client pronto!');
+
+  // Inicia o loop de verificação de pedidos a cada 10 segundos
+  setInterval(() => {
+    verificarNovosPedidos(client);
+  }, 10000); // 10 segundos
+});
 client.on('message', async (msg) => {
   //console.log('[index.js] Mensagem recebida:', msg); // 👈 coloca isso
   //console.log('Nome do grupo:', chat.name);
