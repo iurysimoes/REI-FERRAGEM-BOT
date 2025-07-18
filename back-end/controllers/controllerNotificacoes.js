@@ -25,23 +25,23 @@ async function verificarNovosPedidos(client) {
     `);
 
     const pedidos = resultado.rows;
-
+    
     for (const pedido of pedidos) {
-      const numeroFormatado = `55${pedido.numerozap}@c.us`; // Ex: 5599999999999@c.us
-
-      if (!pedido.pedido || !pedido.andamento || !numeroFormatado) continue;
-
+      const numeroFormatado = `55${pedido.NUMEROZAP}@c.us`; // Ex: 5599999999999@c.us
+     //  console.log(pedido.PEDIDO,pedido.ANDAMENTO,numeroFormatado);
+      if (!pedido.PEDIDO || !pedido.ANDAMENTO || !numeroFormatado) continue;
+      console.log('entrou',numeroFormatado);
       // Envia status pro cliente
       await client.sendMessage(
         numeroFormatado,
-        `📦 Olá! Seu pedido *${pedido.pedido}* está com o status: *${pedido.andamento}*.`
+        `📦 Olá! Seu pedido *${pedido.PEDIDO}* está com o status: *${pedido.ANDAMENTO}*.`
       );
 
       // Se o status for "Finalizado", envia mensagem adicional
-      if (pedido.andamento.toLowerCase() === 'finalizado') {
+      if (pedido.ANDAMENTO.toLowerCase() === 'finalizado') {
         await client.sendMessage(
           numeroFormatado,
-          `🚚 Pedido *${pedido.pedido}* foi finalizado. Favor aguardar a transportadora.`
+          `🚚 Pedido *${pedido.PEDIDO}* foi finalizado. Favor aguardar a transportadora.`
         );
       }
 
@@ -52,7 +52,7 @@ async function verificarNovosPedidos(client) {
           WHERE ANP.PEDIDO_SAIDA_ID = :pedido_saida_id
             AND ANP.ANDAMENTO_PEDIDO_ID = :andamento_pedido_id
           `,
-        [pedido.pedido_saida_id,pedido.andamento_pedido_id],
+        [pedido.PEDIDO_SAIDA_ID,pedido.ANDAMENTO_PEDIDO_ID],
         { autoCommit: true }
       );
     }
