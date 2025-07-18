@@ -2,9 +2,13 @@ require('dotenv').config();
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const handleMessage = require('./router');
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const path = require('path');
 const routesVolumes = require('./routesVolumes'); // ajusta o caminho conforme seu projeto
+
+// ou, se quiser liberar só pra um domínio específico (mais seguro):
+ app.use(cors({ origin: 'https://rei-ferragem-bot.vercel.app' }));
 
 app.use(express.json()); // pra conseguir ler JSON no body das requisições
 app.use(express.static(path.join(__dirname, 'public')));
