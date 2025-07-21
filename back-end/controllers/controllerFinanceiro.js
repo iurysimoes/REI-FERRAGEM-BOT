@@ -24,7 +24,18 @@ async function iniciar(client, msg) {
 
 async function enviarSegundaVia(client, msg, nf) {
   const qr = await db.query(
-    'SELECT cod_barras FROM faturas WHERE nf = :nf',
+    `
+      select TL.TITL_NUMERO ,TL.TITL_VALOR, TL.TITL_POSICAO, TL.TITL_DT_VENCTO
+        from MOVIMENTO_ESTOQUE ME, 
+            RELAC_MVES_FTRA RFTRA, 
+            FATURA FT,
+            TITULO TL
+      where ME.MOVI_NR_NOTA_FISCAL     = :nf
+        and RFTRA.MOVIMENTO_ESTOQUE_ID = ME.MOVIMENTO_ESTOQUE_ID
+        and FT.FATURA_ID               = RFTRA.FATURA_ID
+        and TL.FATURA_ID               = FT.FATURA_ID
+        and TL.TITL_POSICAO            = 'Aberto'  
+   `,
     [nf],
     { outFormat: oracledb.OUT_FORMAT_OBJECT }
   );
