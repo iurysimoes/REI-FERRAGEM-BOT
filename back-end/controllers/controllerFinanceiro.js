@@ -20,7 +20,7 @@ async function continuar(client, msg) {
   const etapa = await flowControl.getStep(userId);
   console.log(`[Financeiro] Etapa atual do usuário ${userId}: ${etapa}`);
   console.log(`[Financeiro] Opção recebida: ${opt}`);
-  
+
   if (opt === '1') {
     await msg.reply('Digite o número da sua Nota Fiscal:');
     await flowControl.setStep(userId, 'financeiro_aguardando_nf');
@@ -41,7 +41,8 @@ async function processarNF(client, msg) {
   const userId = msg.author || msg.from;
   const nf = msg.body.trim();
   const qr = await db.query(
-    `SELECT TL.TITL_NUMERO, TL.TITL_VALOR, TL.TITL_POSICAO, TL.TITL_DT_VENCTO
+    `SELECT TL.TITL_NUMERO, TL.TITL_VALOR, TL.TITL_POSICAO, TL.TITL_DT_VENCTO,
+            TL.TITULO_ID,TL.CARTEIRA_BANCARIA_ID, ME.UNIDADE_EMPRESARIAL_ID
         FROM MOVIMENTO_ESTOQUE ME
         JOIN RELAC_MVES_FTRA RFTRA ON RFTRA.MOVIMENTO_ESTOQUE_ID = ME.MOVIMENTO_ESTOQUE_ID
         JOIN FATURA FT ON FT.FATURA_ID = RFTRA.FATURA_ID
@@ -52,12 +53,30 @@ async function processarNF(client, msg) {
   );
 
   if (qr.rows && qr.rows.length) {
-    const cod = qr.rows[0].COD_BARRAS || 'código não encontrado';
-    await msg.reply(`📄 Segunda via da fatura (NF ${nf}):\nCódigo de barras:\n${cod}`);
+    const row = qr.rows[0];
+    const { UNIDADE_EMPRESARIAL_ID, CARTEIRA_BANCARIA_ID, TITULO_ID } = row;
+
+    const boleto = await obterLinhaDigitavel(UNIDADE_EMPRESARIAL_ID, CARTEIRA_BANCARIA_ID, TITULO_ID);
+
+    if (boleto.sucesso) {
+      await msg.reply(`📄 Segunda via da fatura (NF ${nf}):\n🔢 Linha digitável:\n${boleto.linhaDigitavel}`);
+    } else {
+      await msg.reply('❌ Erro ao gerar a segunda via. Tente novamente ou digite *3* para falar com um atendente.');
+      console.error('Erro na chamada da procedure:', boleto.erro);
+    }
+
     await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, digite *2* ou *3* no menu.');
   } else {
     await msg.reply(`❌ NF ${nf} não encontrada. Digite *Financeiro* para tentar novamente ou *3* para atendimento.`);
   }
+
+  // if (qr.rows && qr.rows.length) {
+  //   const cod = qr.rows[0].COD_BARRAS || 'código não encontrado';
+  //   await msg.reply(`📄 Segunda via da fatura (NF ${nf}):\nCódigo de barras:\n${cod}`);
+  //   await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, digite *2* ou *3* no menu.');
+  // } else {
+  //   await msg.reply(`❌ NF ${nf} não encontrada. Digite *Financeiro* para tentar novamente ou *3* para atendimento.`);
+  // }
 
   await flowControl.clearStep(userId);
 }
@@ -72,6 +91,54 @@ async function redirecionarAtendente(client, msg, setor) {
 
   const link = `https://wa.me/55${tel}?text=${encodeURIComponent('Oi, preciso de ajuda com o financeiro')}`;
   await client.sendMessage(msg.from, `📞 Atendimento disponível: ${link}`);
+}
+
+async function obterLinhaDigitavel(unidadeId, carteiraId, tituloId) {
+  try {
+    const result = await db.query(
+      `
+      BEGIN
+        PRC_DADOS_BOLETO(
+          :P_UNIDADE_EMPRESARIAL_ID,
+          :P_CONTA_CONTA_CORRENTE_ID,
+          :P_CARTEIRA_BANCARIA_ID,
+          :P_TITULO_ID,
+          :P_CODIGO_BARRA,
+          :P_NOSSO_NUMERO,
+          :P_LINHA_DIGITAVEL,
+          :P_NOSSO_NUMEROD,
+          :P_NOSSO_NUMEROP,
+          :P_DIGITAO_COBRANCA,
+          :P_TITL_NOSSO_NUMERO_CORRESP
+        );
+      END;
+      `,
+      {
+        P_UNIDADE_EMPRESARIAL_ID: unidadeId,
+        P_CONTA_CONTA_CORRENTE_ID: { dir: oracledb.BIND_INOUT, type: oracledb.STRING, val: '' }, // passou vazio pq vc não tem valor
+        P_CARTEIRA_BANCARIA_ID: { dir: oracledb.BIND_INOUT, type: oracledb.STRING, val: carteiraId },
+        P_TITULO_ID: tituloId,
+        P_CODIGO_BARRA: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 4000 },
+        P_NOSSO_NUMERO: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 4000 },
+        P_LINHA_DIGITAVEL: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 4000 },
+        P_NOSSO_NUMEROD: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 4000 },
+        P_NOSSO_NUMEROP: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 4000 },
+        P_DIGITAO_COBRANCA: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 4000 },
+        P_TITL_NOSSO_NUMERO_CORRESP: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 4000 }
+      }
+    );
+
+    return {
+      sucesso: true,
+      linhaDigitavel: result.outBinds.P_LINHA_DIGITAVEL,
+      codigoBarra: result.outBinds.P_CODIGO_BARRA,
+      nossoNumero: result.outBinds.P_NOSSO_NUMERO,
+      mensagem: 'Ok'
+    };
+  } catch (err) {
+    console.error('Erro ao executar PRC_DADOS_BOLETO:', err);
+    return { sucesso: false, erro: err };
+  }
 }
 
 module.exports = {
