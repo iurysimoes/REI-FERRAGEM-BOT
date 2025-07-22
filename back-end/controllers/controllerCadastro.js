@@ -1,6 +1,9 @@
+const flowControl = require('../flowcontrol');
 const { getAtendente } = require('../services/atendimentoService');
 
 async function iniciar(client, msg) {
+  const user = msg.from;
+
   const instrucoes = `📋 *Cadastro de Cliente*
 Por favor, envie as seguintes informações em uma única mensagem, separadas por quebra de linha (Enter):
 
@@ -11,22 +14,25 @@ Por favor, envie as seguintes informações em uma única mensagem, separadas po
 5️⃣ Telefone
 6️⃣ CEP`;
 
-  await msg.reply(instrucoes);
+  await client.sendMessage(user, instrucoes);
+  await flowControl.setStep(user, 'aguardando_dados_cadastro');
+}
 
-  const filter = m => m.from === msg.from;
-  const resposta = await client.waitForMessage(filter);
-  const dados = resposta.body.trim();
-
+async function continuar(client, msg) {
+  const user = msg.from;
+  //const user = msg.author || msg.from;
+  const dados = msg.body.trim();
   const linhas = dados.split('\n').map(l => l.trim());
 
   if (linhas.length < 6 || linhas.some(l => l === '')) {
-    await msg.reply('🚫 Dados incompletos ou com campos vazios. Por favor, envie todos os campos solicitados em uma única mensagem. Tente novamente.');
+    await client.sendMessage(user, '🚫 Dados incompletos ou com campos vazios. Por favor, envie todos os campos solicitados em uma única mensagem. Tente novamente.');
     return;
   }
 
   const atendenteTel = await getAtendente('cadastro');
   if (!atendenteTel) {
-    await msg.reply('Nenhum atendente de cadastro disponível no momento.');
+    await client.sendMessage(user, '❌ Nenhum atendente de cadastro disponível no momento.');
+    await flowControl.clearStep(user);
     return;
   }
 
@@ -39,14 +45,21 @@ Por favor, envie as seguintes informações em uma única mensagem, separadas po
 📞 Telefone: ${linhas[4]}
 📍 CEP: ${linhas[5]}
 
-👤 Enviado por: ${msg.from}`;
+👤 Enviado por: ${user}`;
 
-  await client.sendMessage(`${atendenteTel}@c.us`, mensagem).catch(async err => {
+  //await client.sendMessage(`${atendenteTel}@c.us`, mensagem);
+  const destinatario = `${atendenteTel}@c.us`;
+  console.log('Enviando cadastro para:', destinatario);
+  console.log('Mensagem:', mensagem);
+
+  await client.sendMessage(destinatario, mensagem).catch(async err => {
     console.error('Erro ao enviar mensagem para atendente cadastro:', err);
-    await msg.reply('❌ Ocorreu um erro ao enviar seu cadastro para o atendente. Por favor, tente novamente mais tarde.');
+    await client.sendMessage(user, '❌ Ocorreu um erro ao enviar seu cadastro para o atendente. Por favor, tente novamente mais tarde.');
   });
-
-  await msg.reply('✅ Cadastro enviado com sucesso! Obrigado.');
+  await client.sendMessage(user, '✅ Cadastro enviado com sucesso! Obrigado.');
+  console.log(`[controllerCadastro] clearStep antes chamado ${user}`);
+  await flowControl.clearStep(user);
+  console.log(`[controllerCadastro] clearStep chamado depois ${user}`);
 }
 
-module.exports = { iniciar };
+module.exports = { iniciar, continuar };

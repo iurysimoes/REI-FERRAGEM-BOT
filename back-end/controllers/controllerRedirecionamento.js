@@ -2,7 +2,7 @@ const { getAtendente } = require('../services/atendimentoService');
 
 async function redirecionar(client, msg, setor, motivoTexto) {
   const tel = await getAtendente(setor);
-
+  console.log(tel);
   if (!tel) {
     await msg.reply('Nenhum atendente disponível nesse setor no momento. Tente novamente mais tarde.');
     return;

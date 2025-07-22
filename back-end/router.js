@@ -34,6 +34,18 @@ async function handleMessage(client, msg) {
     return controllerPedido.iniciar(client, msg);
   }
 
+  // if (etapa === 'aguardando_dados') {
+  //   return controllerCadastro.iniciar(client, msg);
+  // }
+  
+  if (etapa === 'aguardando_dados_cadastro') {
+    return controllerCadastro.continuar(client, msg);
+    
+  }
+   // Fluxo Antecipado - passo 1: aguarda arquivo
+  if (etapa === 'aguardando_comprovante_antecipado') {
+    return controllerAntecipado.continuar(client, msg);
+  }
   // 🎯 Gatilhos de entrada (menus principais)
 
   if (text.includes('pedido chegou')) {
@@ -52,10 +64,12 @@ async function handleMessage(client, msg) {
   }
 
   if (text.includes('antecipado')) {
+    await flowControl.setStep(userId, 'aguardando_comprovante_antecipado');
     return controllerAntecipado.iniciar(client, msg);
   }
-
+  
   if (text.includes('cadastro cliente')) {
+    await flowControl.setStep(userId, 'aguardando_dados_cadastro'); // já define aqui també
     return controllerCadastro.iniciar(client, msg);
   }
 

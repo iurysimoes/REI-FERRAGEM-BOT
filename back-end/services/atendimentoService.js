@@ -2,7 +2,7 @@ const db = require('../database/db');
 
 async function getAtendente(setor) {
   const sql = `
-    select S.WHATSAPP_ATENDENTE TELEFONE_WHATSAPP
+    select '55'||S.WHATSAPP_ATENDENTE TELEFONE_WHATSAPP
      from ATENDENTE_WHATSAPP S 
     where lower(S.NOME_SETOR) = :setor
       and rownum <= 1
