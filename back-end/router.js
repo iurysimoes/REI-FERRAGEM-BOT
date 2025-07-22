@@ -34,10 +34,19 @@ async function handleMessage(client, msg) {
     return controllerPedido.iniciar(client, msg);
   }
 
-  // if (etapa === 'aguardando_dados') {
-  //   return controllerCadastro.iniciar(client, msg);
+  // if (etapa === 'financeiro_menu') {
+  // return controllerFinanceiro.continuar(client, msg);
   // }
-  
+
+if (etapa?.toLowerCase() === 'financeiro_menu') {
+ console.log('[router.js] Chamando controllerFinanceiro.continuar');
+ return controllerFinanceiro.continuar(client, msg);
+}
+
+  if (etapa === 'financeiro_aguardando_nf') {
+    return controllerFinanceiro.processarNF(client, msg);
+  }
+
   if (etapa === 'aguardando_dados_cadastro') {
     return controllerCadastro.continuar(client, msg);
     
@@ -60,9 +69,11 @@ async function handleMessage(client, msg) {
   }
 
   if (text.includes('financeiro')) {
+    console.log('[router.js] Fluxo financeiro iniciado. Etapa setada para financeiro_menu');
+    await flowControl.setStep(userId, 'financeiro_menu');
     return controllerFinanceiro.iniciar(client, msg);
   }
-
+  
   if (text.includes('antecipado')) {
     await flowControl.setStep(userId, 'aguardando_comprovante_antecipado');
     return controllerAntecipado.iniciar(client, msg);
