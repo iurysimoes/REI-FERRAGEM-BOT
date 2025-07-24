@@ -103,7 +103,7 @@ if (etapa?.toLowerCase() === 'financeiro_menu') {
   // Fallback
   await client.sendMessage(
     msg.from,
-    '🤖 Olá! Não entendi sua mensagem. Digite uma das palavras-chave como *Pedido*, *Financeiro*, *Cadastro Cliente*, *Antecipado*, *Pós-Venda*, *Volume Danificado*, *Volume Faltou* ou *Outros Assuntos*.'
+    '🤖 Olá! Digite uma das palavras-chave como \n *Pedido* \n *Financeiro* \n *Cadastro Cliente* \n *Antecipado* \n *Pós-Venda* \n *Volume Danificado* \n *Volume Faltou* \n *Outros Assuntos*'
   );
 }
 
