@@ -5,7 +5,6 @@ const { getAtendente } = require('../services/atendimentoService');
 //const { setStep, getStep, clearStep } = require('../flowcontrol');
 const flowControl = require('../flowcontrol');
 
-
 async function iniciar(client, msg) {
   const userId = msg.author || msg.from;
   const etapa = await flowControl.getStep(userId);
@@ -112,7 +111,7 @@ async function chegou(client, msg) {
 
       const baseUrl = 'https://seuservidor.com'; // Substituir pelo seu domínio real ou ngrok
       const url = `${baseUrl}/index.html?idPedido=${encodeURIComponent(numeroPedido)}&userId=${encodeURIComponent(userId)}`;
-
+      
       return client.sendMessage(
         msg.from,
         `📦 Beleza! Agora clique no link abaixo para escanear os volumes do pedido.\n\n` +
@@ -132,7 +131,7 @@ async function chegou(client, msg) {
 async function redirecionarAtendente(client, msg, setor) {
   const tel = await getAtendente(setor);
   if (!tel) return client.sendMessage(msg.from, 'Desculpa, não achei um atendente agora.');
-
+  await flowControl.clearStep(userId);
   await client.sendMessage(
     msg.from,
     //`📞 Atendente disponível: https://wa.me/55${tel}?text=${encodeURIComponent('Oi, preciso de ajuda sobre ' + setor)}`
