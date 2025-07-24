@@ -65,7 +65,8 @@ async function gerarBoletoPDF({
       doc.fontSize(10).text(`Empresa: ${recebedorNome || ''}`, 40, 280);
       doc.fontSize(10).text(`CNPJ: ${recebedorCnpj || ''}`, 40, 295);
 
-      doc.moveTo(40, 320).lineTo(555, 320).stroke();
+      doc.moveTo(40, 320).lineTo(555, 320).stroke(); text: codigoBarra || '',
+        
 
       // ===== Código de barras gráfico =====
       doc.fontSize(10).text('Código de Barras:', 40, 330);
@@ -73,8 +74,7 @@ async function gerarBoletoPDF({
       // Gerar imagem do código de barras no padrão boleto (interleaved2of5)
       const pngBuffer = await bwipjs.toBuffer({
         bcid: 'interleaved2of5',
-        text: codigoBarra || '',
-        scale: 3,
+       scale: 3,
         height: 50,
         includetext: false,
         backgroundcolor: 'FFFFFF'
