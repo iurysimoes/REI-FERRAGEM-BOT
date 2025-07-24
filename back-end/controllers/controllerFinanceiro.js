@@ -4,6 +4,8 @@ const db = require('../database/db');
 const { getAtendente } = require('../services/atendimentoService');
 const oracledb = require('oracledb');
 const flowControl = require('../flowcontrol');
+const { gerarBoletoPDF } = require('../utils/pdfBoleto'); // ajuste o caminho conforme onde você salvou a função
+const fs = require('fs');
 
 async function iniciar(client, msg) {
   const userId = msg.author || msg.from;
@@ -39,36 +41,62 @@ async function continuar(client, msg) {
 
 async function processarNF(client, msg) {
   const userId = msg.author || msg.from;
-  const nf = msg.body.trim();
+  //const nf = msg.body.trim();
+  const nf = parseInt(msg.body.trim());
   const qr = await db.query(
     `SELECT TL.TITL_NUMERO, TL.TITL_VALOR, TL.TITL_POSICAO, TL.TITL_DT_VENCTO,
-            TL.TITULO_ID,TL.CARTEIRA_BANCARIA_ID, ME.UNIDADE_EMPRESARIAL_ID
-        FROM MOVIMENTO_ESTOQUE ME
-        JOIN RELAC_MVES_FTRA RFTRA ON RFTRA.MOVIMENTO_ESTOQUE_ID = ME.MOVIMENTO_ESTOQUE_ID
-        JOIN FATURA FT ON FT.FATURA_ID = RFTRA.FATURA_ID
-        JOIN TITULO TL ON TL.FATURA_ID = FT.FATURA_ID
+            TL.TITULO_ID,TL.CARTEIRA_BANCARIA_ID, ME.UNIDADE_EMPRESARIAL_ID,
+            PC.PRCR_NOME, PC.PRCR_CGC_CPF,
+            UNEM.PRCR_NOME NOME_EMPRESA,
+            UNEM.PRCR_CGC_CPF  CNPJ_EMPRESA
+        FROM MOVIMENTO_ESTOQUE ME,
+             RELAC_MVES_FTRA RFTRA, 
+             FATURA FT,    
+             TITULO TL,
+             PARCEIRO PC,
+             PARCEIRO UNEM 
       WHERE ME.MOVI_NR_NOTA_FISCAL = :nf
-        AND TL.TITL_POSICAO = 'Aberto'`,
+        AND TL.TITL_POSICAO  = 'Aberto'
+        AND RFTRA.MOVIMENTO_ESTOQUE_ID = ME.MOVIMENTO_ESTOQUE_ID
+        AND FT.FATURA_ID     = RFTRA.FATURA_ID
+        AND TL.FATURA_ID     = FT.FATURA_ID
+        AND PC.PARCEIRO_ID   = FT.PARCEIRO_ID
+        AND UNEM.PARCEIRO_ID = ME.UNIDADE_EMPRESARIAL_ID`,
          [nf], { outFormat: oracledb.OUT_FORMAT_OBJECT }
   );
 
   if (qr.rows && qr.rows.length) {
     const row = qr.rows[0];
-    const { UNIDADE_EMPRESARIAL_ID, CARTEIRA_BANCARIA_ID, TITULO_ID } = row;
+    const { UNIDADE_EMPRESARIAL_ID, CARTEIRA_BANCARIA_ID, TITULO_ID,NOME_EMPRESA, CNPJ_EMPRESA } = row;
 
     const boleto = await obterLinhaDigitavel(UNIDADE_EMPRESARIAL_ID, CARTEIRA_BANCARIA_ID, TITULO_ID);
 
     if (boleto.sucesso) {
+      const caminhoPDF = await gerarBoletoPDF({
+        nome: row.PRCR_NOME,
+        cpfCnpj: row.PRCR_CGC_CPF,
+        valor: row.TITL_VALOR,
+        vencimento: row.TITL_DT_VENCTO,
+        linhaDigitavel: boleto.linhaDigitavel,
+        codigoBarra: boleto.codigoBarra,
+        recebedorNome: row.NOME_EMPRESA,
+        recebedorCnpj: row.CNPJ_EMPRESA
+      });
+      console.log('Arquivo PDF gerado em:', caminhoPDF);
+      console.log('Arquivo existe?', fs.existsSync(caminhoPDF));
       await msg.reply(`📄 Segunda via da fatura (NF ${nf}):\n🔢 Linha digitável:\n${boleto.linhaDigitavel}`);
-    } else {
-      await msg.reply('❌ Erro ao gerar a segunda via. Tente novamente ou digite *3* para falar com um atendente.');
-      console.error('Erro na chamada da procedure:', boleto.erro);
-    }
 
-    await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, digite *2* ou *3* no menu.');
-  } else {
-    await msg.reply(`❌ NF ${nf} não encontrada. Digite *Financeiro* para tentar novamente ou *3* para atendimento.`);
-  }
+      await client.sendMessage(msg.from, fs.readFileSync(caminhoPDF), {
+        sendMediaAsDocument: true,
+        filename: `boleto_${nf}.pdf`
+      });
+
+     // fs.unlinkSync(caminhoPDF);
+
+      await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, digite *2* ou *3* no menu.');
+    } else {
+      await msg.reply(`❌ NF ${nf} não encontrada. Digite *Financeiro* para tentar novamente ou *3* para atendimento.`);
+    }
 
   // if (qr.rows && qr.rows.length) {
   //   const cod = qr.rows[0].COD_BARRAS || 'código não encontrado';
@@ -79,6 +107,7 @@ async function processarNF(client, msg) {
   // }
 
   await flowControl.clearStep(userId);
+ }
 }
 
 
@@ -134,6 +163,7 @@ async function obterLinhaDigitavel(unidadeId, carteiraId, tituloId) {
       codigoBarra: result.outBinds.P_CODIGO_BARRA,
       nossoNumero: result.outBinds.P_NOSSO_NUMERO,
       mensagem: 'Ok'
+      
     };
   } catch (err) {
     console.error('Erro ao executar PRC_DADOS_BOLETO:', err);

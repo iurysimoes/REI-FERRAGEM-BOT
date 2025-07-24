@@ -7,10 +7,13 @@
     "start": "node back-end/index.js"
   },
   "dependencies": {
+    "boleto-pdf": "^0.4.0",
+    "bwip-js": "^4.7.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^5.1.0",
     "oracledb": "^6.8.0",
+    "pdfkit": "^0.17.1",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.23.0"
   }
