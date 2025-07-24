@@ -72,9 +72,12 @@ async function gerarBoletoPDF({
       doc.fontSize(10).text('Código de Barras:', 40, 330);
 
       // Gerar imagem do código de barras no padrão boleto (interleaved2of5)
+      console.log('Código de barras recebido:', codigoBarra);
+
       const pngBuffer = await bwipjs.toBuffer({
         bcid: 'interleaved2of5',
-       scale: 3,
+        text: codigoBarra,  // <== ESSA LINHA É OBRIGATÓRIA!
+        scale: 3,
         height: 50,
         includetext: false,
         backgroundcolor: 'FFFFFF'
