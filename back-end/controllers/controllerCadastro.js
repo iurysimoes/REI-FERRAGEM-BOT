@@ -61,5 +61,5 @@ async function continuar(client, msg) {
   await flowControl.clearStep(user);
   console.log(`[controllerCadastro] clearStep chamado depois ${user}`);
 }
-
+ 
 module.exports = { iniciar, continuar };
