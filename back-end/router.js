@@ -16,7 +16,7 @@ async function handleMessage(client, msg) {
   if (!msg.from.endsWith('@g.us')) return;
 
   const chat = await msg.getChat();
-  if (!chat.isGroup || chat.name !== 'BOT REI 2') return;
+  if (!chat.isGroup || chat.name !== 'BOT REI 3') return;
 
   const userId = msg.author || msg.from;
   const text = msg.body?.toLowerCase().trim() || '';

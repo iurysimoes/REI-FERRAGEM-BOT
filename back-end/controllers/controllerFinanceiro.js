@@ -109,7 +109,8 @@ async function processarNF(client, msg) {
       await flowControl.setStep(userId, 'financeiro_pos_boleto');
      // fs.unlinkSync(caminhoPDF);
 
-      await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, digite *2*');
+      await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, digite *2* ou Digite Menu');
+      await flowControl.clearStep(userId);
     } else {
       await msg.reply(`❌ NF ${nf} não encontrada. Digite *Financeiro* para tentar novamente ou *2* para atendimento.`);
     }

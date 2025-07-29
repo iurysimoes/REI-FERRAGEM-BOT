@@ -45,6 +45,7 @@ async function iniciar(client, msg) {
       if (qr.rows?.length) {
         await client.sendMessage(msg.from, `📦 Pedido *${numero}* - Status: *${qr.rows[0].ANPD_ANDAMENTO}*`);
         await client.sendMessage(msg.from, '✅ Caso precise de mais ajuda, digite *2* para falar com um atendente.');
+        await flowControl.clearStep(userId);
       } else {
         await client.sendMessage(msg.from, '❌ Pedido não encontrado. Digite novamente ou *2* para atendimento.');
       }
