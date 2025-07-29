@@ -65,6 +65,7 @@ async function chegou(client, msg) {
   const texto = msg.body.trim();
 
   if (!etapa) {
+    console.log('entrou aqui')
     await flowControl.setStep(userId, 'chegou_menu');
     return client.sendMessage(
       msg.from,
@@ -135,7 +136,7 @@ async function redirecionarAtendente(client, msg, setor) {
   if (!tel) return client.sendMessage(msg.from, 'Desculpa, não achei um atendente agora.');
   
   await flowControl.clearStep(userId);
-  
+
   await client.sendMessage(
     msg.from,
     //`📞 Atendente disponível: https://wa.me/55${tel}?text=${encodeURIComponent('Oi, preciso de ajuda sobre ' + setor)}`

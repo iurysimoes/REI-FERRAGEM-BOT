@@ -30,6 +30,10 @@ async function handleMessage(client, msg) {
     return controllerPedido.chegou(client, msg); // fluxo múltiplas etapas do "Pedido Chegou"
   }
 
+  if (etapa === 'aguardando_numero_pedido_codigo') {
+    return controllerPedido.chegou(client, msg); // fluxo "Pedido Chegou"
+  }
+
   if (etapa === 'acompanhamento' || etapa === 'AGUARDANDO_NUMERO')  {
     return controllerPedido.iniciar(client, msg);
   }
@@ -59,11 +63,13 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
   // 🎯 Gatilhos de entrada (menus principais)
 
   if (text.includes('pedido chegou')) {
-    await flowControl.setStep(userId, 'chegou_menu');
+    console.log('chamou pedido chegou');
+    //await flowControl.setStep(userId, 'chegou_menu');
     return controllerPedido.chegou(client, msg);
   }
 
   if (text.includes('pedido')) {
+    console.log('chamou pedido ');
     //await setStep(userId, 'acompanhamento');
     await flowControl.clearStep(userId);
     return controllerPedido.iniciar(client, msg);
@@ -104,7 +110,7 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
   // Fallback
   await client.sendMessage(
     msg.from,
-    '🤖 Olá! Digite uma das palavras-chave como \n *Pedido* \n *Financeiro* \n *Cadastro Cliente* \n *Antecipado* \n *Pós-Venda* \n *Volume Danificado* \n *Volume Faltou* \n *Outros Assuntos*'
+    '🤖 Olá! Digite uma das palavras-chave como \n *Pedido* \n *Financeiro* \n *Cadastro Cliente* \n *Antecipado* \n *Pós-Venda* \n *Pedido Chegou* \n *Volume Danificado* \n *Volume Faltou* \n *Outros Assuntos*'
   );
 }
 
