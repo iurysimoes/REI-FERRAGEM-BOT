@@ -23,7 +23,16 @@ async function iniciar(client, msg) {
   }
    
   if (etapa === 'AGUARDANDO_NUMERO') {
-    const numero = texto;
+    //const numero = texto;
+    const nTexto = texto;
+
+  // Verifica se é um número válido
+  if (!/^\d+$/.test(nTexto)) {
+    await msg.reply('❌ Por favor, envie apenas o número do pedido (somente números).');
+    return;
+  }
+
+  const numero = parseInt(nTexto); // agora com segurança
     console.log(numero);
     try {
       const qr = await db.query(
@@ -44,10 +53,11 @@ async function iniciar(client, msg) {
 
       if (qr.rows?.length) {
         await client.sendMessage(msg.from, `📦 Pedido *${numero}* - Status: *${qr.rows[0].ANPD_ANDAMENTO}*`);
-        await client.sendMessage(msg.from, '✅ Caso precise de mais ajuda, digite *2* para falar com um atendente.');
+        await client.sendMessage(msg.from, '✅ Caso precise de mais ajuda, digite *2* para voltar ao menu e selecione Atendimento.');
         await flowControl.clearStep(userId);
       } else {
-        await client.sendMessage(msg.from, '❌ Pedido não encontrado. Digite novamente ou *2* para atendimento.');
+        await client.sendMessage(msg.from, '❌ Pedido não encontrado. Digite novamente ou *2* para voltar ao menu e selecione Atendimento.');
+        await flowControl.clearStep(userId);
       }
     } catch (err) {
       console.error('[controllerPedido] Erro na consulta:', err);
@@ -84,7 +94,7 @@ async function chegou(client, msg) {
       await flowControl.clearStep(userId);
       return client.sendMessage(
         msg.from,
-        `ℹ️ *Como prosseguir com seu pedido:*\n\n- Verifique os volumes com o leitor de código de barras\n- Confirme os volumes recebidos\n- Em caso de divergência, selecione 'Falar com atendente'\n\nSe precisar de ajuda, digite *3*.`
+        `ℹ️ *Como prosseguir com seu pedido:*\n\n- Verifique os volumes com o leitor de código de barras\n- Confirme os volumes recebidos\n- Em caso de divergência, digite Menu e escolha a opção Falar com atendente\n.`
       );
     }
 

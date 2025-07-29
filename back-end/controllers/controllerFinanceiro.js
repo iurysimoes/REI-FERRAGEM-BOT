@@ -29,7 +29,7 @@ async function continuar(client, msg) {
       await flowControl.clearStep(userId);
       return redirecionarAtendente(client, msg, 'financeiro');
     } else {
-      await msg.reply('❌ Opção inválida. Digite *2* para renegociar ou para falar com atendente.');
+      await msg.reply('❌ Opção inválida. Digite *2* para renegociar ou para falar com atendente.\n');
       return;
     }
   }
@@ -45,14 +45,24 @@ async function continuar(client, msg) {
     return redirecionarAtendente(client, msg, 'financeiro');
   }
   
-  await msg.reply('❌ Opção inválida. Digite *Financeiro* para tentar novamente.');
+  await msg.reply('❌ Opção inválida. Digite *1*,*2* ou *3* para tentar novamente.');
 }
 
 
 async function processarNF(client, msg) {
   const userId = msg.author || msg.from;
   //const nf = msg.body.trim();
-  const nf = parseInt(msg.body.trim());
+  //const nf = parseInt(msg.body.trim());
+  const nfTexto = msg.body.trim();
+
+  // Verifica se é um número válido
+  if (!/^\d+$/.test(nfTexto)) {
+    await msg.reply('❌ Por favor, envie apenas o número da nota fiscal (somente números).');
+    return;
+  }
+
+  const nf = parseInt(nfTexto); // agora com segurança
+  
   const qr = await db.query(
     `SELECT TL.TITL_NUMERO, TL.TITL_VALOR, TL.TITL_POSICAO, TL.TITL_DT_VENCTO,
             TL.TITULO_ID,TL.CARTEIRA_BANCARIA_ID, ME.UNIDADE_EMPRESARIAL_ID,
@@ -109,8 +119,9 @@ async function processarNF(client, msg) {
       await flowControl.setStep(userId, 'financeiro_pos_boleto');
      // fs.unlinkSync(caminhoPDF);
 
-      await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, digite *2* ou Digite Menu');
+      await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, Digite Menu');
       await flowControl.clearStep(userId);
+      //return redirecionarAtendente(client, msg, 'financeiro');
     } else {
       await msg.reply(`❌ NF ${nf} não encontrada. Digite *Financeiro* para tentar novamente ou *2* para atendimento.`);
     }

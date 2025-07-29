@@ -151,7 +151,7 @@ async function startScanner() {
         displayMessage('Código detectado: ' + codigo, 'info');
 
         try {
-          const res = await fetch('https://a7d868a95618.ngrok-free.app/api/validar-volume', {
+          const res = await fetch('https://f6c26b600d0d.ngrok-free.app/api/validar-volume', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idPedido, codigoBarras: codigo, userId: userId })

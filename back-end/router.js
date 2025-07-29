@@ -16,7 +16,7 @@ async function handleMessage(client, msg) {
   if (!msg.from.endsWith('@g.us')) return;
 
   const chat = await msg.getChat();
-  if (!chat.isGroup || chat.name !== 'BOT REI 3') return;
+  if (!chat.isGroup || chat.name !== 'BOT REI') return;
 
   const userId = msg.author || msg.from;
   const text = msg.body?.toLowerCase().trim() || '';
@@ -31,6 +31,10 @@ async function handleMessage(client, msg) {
   }
 
   if (etapa === 'aguardando_numero_pedido_codigo') {
+    return controllerPedido.chegou(client, msg); // fluxo "Pedido Chegou"
+  }
+
+  if (etapa === 'aguardando_redirecionar_Chegou') {
     return controllerPedido.chegou(client, msg); // fluxo "Pedido Chegou"
   }
 
@@ -110,7 +114,7 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
   // Fallback
   await client.sendMessage(
     msg.from,
-    '🤖 Olá! Digite uma das palavras-chave como \n *Pedido* \n *Financeiro* \n *Cadastro Cliente* \n *Antecipado* \n *Pós-Venda* \n *Pedido Chegou* \n *Volume Danificado* \n *Volume Faltou* \n *Outros Assuntos*'
+    '🤖 Olá! Digite uma das palavras-chave \n para iniciar o seu atendimento  \n\n *Pedido* \n *Financeiro* \n *Cadastro Cliente* \n *Antecipado* \n *Pós-Venda* \n *Pedido Chegou* \n *Volume Danificado* \n *Volume Faltou* \n *Outros Assuntos*'
   );
 }
 

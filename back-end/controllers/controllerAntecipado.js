@@ -39,7 +39,9 @@ async function continuar(client, msg) {
       caption: `📩 Novo comprovante de pagamento recebido do cliente ${user}`
     });
     await client.sendMessage(user, '✅ Comprovante recebido com sucesso. Obrigado!');
+    const user2 = msg.author;
     await flowControl.clearStep(user);
+    await flowControl.clearStep(user2);
   } catch (error) {
     console.error('Erro ao enviar comprovante para atendente:', error);
     await client.sendMessage(user, '❌ Ocorreu um erro ao enviar seu comprovante. Tente novamente mais tarde.');

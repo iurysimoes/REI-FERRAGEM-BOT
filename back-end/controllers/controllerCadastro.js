@@ -59,8 +59,10 @@ async function continuar(client, msg) {
   });
   await client.sendMessage(user, '✅ Cadastro enviado com sucesso! Obrigado.');
   console.log(`[controllerCadastro] clearStep antes chamado ${user}`);
+  const user2 = msg.author;
   await flowControl.clearStep(user);
-  console.log(`[controllerCadastro] clearStep chamado depois ${user}`);
+  await flowControl.clearStep(user2);
+  console.log(`[controllerCadastro] clearStep chamado depois ${user2}`);
 }
  
 module.exports = { iniciar, continuar };
