@@ -14,7 +14,8 @@ const { verificarNovosPedidos } = require('./controllers/controllerNotificacoes'
 app.use(express.json()); // pra conseguir ler JSON no body das requisições
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api', routesVolumes);
+app.use('/', routesVolumes);
+//app.use('/api', routesVolumes);
 
 const client = new Client({
   authStrategy: new LocalAuth(),
