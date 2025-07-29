@@ -6,6 +6,8 @@ const oracledb = require('oracledb');
 const flowControl = require('../flowcontrol');
 const { gerarBoletoPDF } = require('../utils/pdfBoleto'); // ajuste o caminho conforme onde você salvou a função
 const fs = require('fs');
+const { MessageMedia } = require('whatsapp-web.js');
+
 
 async function iniciar(client, msg) {
   const userId = msg.author || msg.from;
@@ -20,9 +22,17 @@ async function continuar(client, msg) {
   const opt = msg.body.trim();
 
   const etapa = await flowControl.getStep(userId);
-  console.log(`[Financeiro] Etapa atual do usuário ${userId}: ${etapa}`);
-  console.log(`[Financeiro] Opção recebida: ${opt}`);
-
+  //console.log(`[Financeiro] Etapa atual do usuário ${userId}: ${etapa}`);
+  //console.log(`[Financeiro] Opção recebida: ${opt}`);
+  if (etapa === 'financeiro_pos_boleto') {
+    if (opt === '2') {
+      await flowControl.clearStep(userId);
+      return redirecionarAtendente(client, msg, 'financeiro');
+    } else {
+      await msg.reply('❌ Opção inválida. Digite *2* para renegociar ou para falar com atendente.');
+      return;
+    }
+  }
   if (opt === '1') {
     await msg.reply('Digite o número da sua Nota Fiscal:');
     await flowControl.setStep(userId, 'financeiro_aguardando_nf');
@@ -34,7 +44,7 @@ async function continuar(client, msg) {
     await flowControl.clearStep(userId);
     return redirecionarAtendente(client, msg, 'financeiro');
   }
-
+  
   await msg.reply('❌ Opção inválida. Digite *Financeiro* para tentar novamente.');
 }
 
@@ -85,17 +95,23 @@ async function processarNF(client, msg) {
       console.log('Arquivo PDF gerado em:', caminhoPDF);
       console.log('Arquivo existe?', fs.existsSync(caminhoPDF));
       await msg.reply(`📄 Segunda via da fatura (NF ${nf}):\n🔢 Linha digitável:\n${boleto.linhaDigitavel}`);
+       
+      const pdfBuffer = fs.readFileSync(caminhoPDF);
+      const media = new MessageMedia('application/pdf', pdfBuffer.toString('base64'), `boleto_${nf}.pdf`);
 
-      await client.sendMessage(msg.from, fs.readFileSync(caminhoPDF), {
-        sendMediaAsDocument: true,
-        filename: `boleto_${nf}.pdf`
+      // await client.sendMessage(msg.from, fs.readFileSync(caminhoPDF), {
+      //   sendMediaAsDocument: true,
+      //   filename: `boleto_${nf}.pdf`
+      // });
+      await client.sendMessage(msg.from, media, {
+       sendMediaAsDocument: true
       });
-
+      await flowControl.setStep(userId, 'financeiro_pos_boleto');
      // fs.unlinkSync(caminhoPDF);
 
-      await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, digite *2* ou *3* no menu.');
+      await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, digite *2*');
     } else {
-      await msg.reply(`❌ NF ${nf} não encontrada. Digite *Financeiro* para tentar novamente ou *3* para atendimento.`);
+      await msg.reply(`❌ NF ${nf} não encontrada. Digite *Financeiro* para tentar novamente ou *2* para atendimento.`);
     }
 
   // if (qr.rows && qr.rows.length) {
@@ -105,8 +121,9 @@ async function processarNF(client, msg) {
   // } else {
   //   await msg.reply(`❌ NF ${nf} não encontrada. Digite *Financeiro* para tentar novamente ou *3* para atendimento.`);
   // }
-
-  await flowControl.clearStep(userId);
+  
+ 
+  //await flowControl.clearStep(userId);
  }
 }
 

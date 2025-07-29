@@ -59,7 +59,8 @@ async function iniciar(client, msg) {
 
 
 async function chegou(client, msg) {
-  const userId = msg.from;
+  //const userId = msg.from;
+  const userId = msg.author || msg.from;
   const etapa = await flowControl.getStep(userId);
   const texto = msg.body.trim();
 
@@ -130,8 +131,11 @@ async function chegou(client, msg) {
 
 async function redirecionarAtendente(client, msg, setor) {
   const tel = await getAtendente(setor);
+  const userId = msg.author || msg.from;
   if (!tel) return client.sendMessage(msg.from, 'Desculpa, não achei um atendente agora.');
+  
   await flowControl.clearStep(userId);
+  
   await client.sendMessage(
     msg.from,
     //`📞 Atendente disponível: https://wa.me/55${tel}?text=${encodeURIComponent('Oi, preciso de ajuda sobre ' + setor)}`

@@ -3,6 +3,7 @@ const { getAtendente } = require('../services/atendimentoService');
 
 async function iniciar(client, msg) {
   const user = msg.from;
+  //const user = msg.author || msg.from;
 
   const instrucoes = `📋 *Cadastro de Cliente*
 Por favor, envie as seguintes informações em uma única mensagem, separadas por quebra de linha (Enter):

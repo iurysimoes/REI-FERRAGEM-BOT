@@ -38,8 +38,9 @@ async function handleMessage(client, msg) {
   // return controllerFinanceiro.continuar(client, msg);
   // }
 
-if (etapa?.toLowerCase() === 'financeiro_menu') {
- console.log('[router.js] Chamando controllerFinanceiro.continuar');
+//if (etapa?.toLowerCase() === 'financeiro_menu') {
+if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
+ //console.log('[router.js] Chamando controllerFinanceiro.continuar');
  return controllerFinanceiro.continuar(client, msg);
 }
 
@@ -84,7 +85,7 @@ if (etapa?.toLowerCase() === 'financeiro_menu') {
     return controllerCadastro.iniciar(client, msg);
   }
 
-  if (text.includes('pós venda') || text.includes('pós-venda')) {
+  if (text.includes('pós venda') || text.includes('pos venda')) {
     return redirecionar(client, msg, 'posvenda', 'Pós-Venda');
   }
 
