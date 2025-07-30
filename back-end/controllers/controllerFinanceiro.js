@@ -80,7 +80,8 @@ async function processarNF(client, msg) {
         AND FT.FATURA_ID     = RFTRA.FATURA_ID
         AND TL.FATURA_ID     = FT.FATURA_ID
         AND PC.PARCEIRO_ID   = FT.PARCEIRO_ID
-        AND UNEM.PARCEIRO_ID = ME.UNIDADE_EMPRESARIAL_ID`,
+        AND UNEM.PARCEIRO_ID = ME.UNIDADE_EMPRESARIAL_ID
+        AND TRUNC(TL.TITL_DT_VENCTO) >= TRUNC(SYSDATE) `,
          [nf], { outFormat: oracledb.OUT_FORMAT_OBJECT }
   );
 
