@@ -8,14 +8,12 @@ const { gerarBoletoPDF } = require('../utils/pdfBoleto'); // ajuste o caminho co
 const fs = require('fs');
 const { MessageMedia } = require('whatsapp-web.js');
 
-
 async function iniciar(client, msg) {
   const userId = msg.author || msg.from;
   const menu = `*Financeiro*\n1️⃣ Segunda via de fatura\n2️⃣ Renegociar fatura\n3️⃣ Falar com atendente`;
   await msg.reply(menu);
   await flowControl.setStep(userId, 'financeiro_menu');
 }
-
 
 async function continuar(client, msg) {
   const userId = msg.author || msg.from;
@@ -29,7 +27,7 @@ async function continuar(client, msg) {
       await flowControl.clearStep(userId);
       return redirecionarAtendente(client, msg, 'financeiro');
     } else {
-      await msg.reply('❌ Opção inválida. Digite *2* para renegociar ou para falar com atendente.\n');
+      await msg.reply('❌ Opção inválida. Digite 2️⃣ para renegociar ou para falar com atendente.\n');
       return;
     }
   }
@@ -64,7 +62,8 @@ async function processarNF(client, msg) {
   const nf = parseInt(nfTexto); // agora com segurança
   
   const qr = await db.query(
-    `SELECT TL.TITL_NUMERO, TL.TITL_VALOR, TL.TITL_POSICAO, TL.TITL_DT_VENCTO,
+    `SELECT TL.TITL_NUMERO, TL.TITL_VALOR, TL.TITL_POSICAO,
+            TO_CHAR(TL.TITL_DT_VENCTO, 'DD/MM/YYYY')TITL_DT_VENCTO,
             TL.TITULO_ID,TL.CARTEIRA_BANCARIA_ID, ME.UNIDADE_EMPRESARIAL_ID,
             PC.PRCR_NOME, PC.PRCR_CGC_CPF,
             UNEM.PRCR_NOME NOME_EMPRESA,
@@ -87,7 +86,9 @@ async function processarNF(client, msg) {
 
   if (qr.rows && qr.rows.length) {
     const row = qr.rows[0];
-    const { UNIDADE_EMPRESARIAL_ID, CARTEIRA_BANCARIA_ID, TITULO_ID,NOME_EMPRESA, CNPJ_EMPRESA } = row;
+    const { UNIDADE_EMPRESARIAL_ID, CARTEIRA_BANCARIA_ID, TITULO_ID,NOME_EMPRESA, CNPJ_EMPRESA,PRCR_NOME,
+            TITL_DT_VENCTO,TITL_VALOR 
+     } = row;
 
     const boleto = await obterLinhaDigitavel(UNIDADE_EMPRESARIAL_ID, CARTEIRA_BANCARIA_ID, TITULO_ID);
 
@@ -104,7 +105,8 @@ async function processarNF(client, msg) {
       });
       console.log('Arquivo PDF gerado em:', caminhoPDF);
       console.log('Arquivo existe?', fs.existsSync(caminhoPDF));
-      await msg.reply(`📄 Segunda via da fatura (NF ${nf}):\n🔢 Linha digitável:\n${boleto.linhaDigitavel}`);
+      await msg.reply(`📄 Segunda via da fatura (NF ${nf}):\n👤 Cliente:${row.PRCR_NOME} \n💲 Valor Fatura: ${row.TITL_VALOR} \n🗓️Vencimento:${row.TITL_DT_VENCTO}\n🔢 Linha digitável:\n${boleto.linhaDigitavel}`
+                    );
        
       const pdfBuffer = fs.readFileSync(caminhoPDF);
       const media = new MessageMedia('application/pdf', pdfBuffer.toString('base64'), `boleto_${nf}.pdf`);
@@ -119,7 +121,7 @@ async function processarNF(client, msg) {
       await flowControl.setStep(userId, 'financeiro_pos_boleto');
      // fs.unlinkSync(caminhoPDF);
 
-      await msg.reply('✅ Caso precise de renegociar ou falar com um atendente, Digite Menu');
+      await msg.reply('✅ Caso precise retornar Digite Menu ou digite 0️⃣');
       await flowControl.clearStep(userId);
       //return redirecionarAtendente(client, msg, 'financeiro');
     } else {

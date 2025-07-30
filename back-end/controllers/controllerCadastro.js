@@ -26,7 +26,7 @@ async function continuar(client, msg) {
   const linhas = dados.split('\n').map(l => l.trim());
 
   if (linhas.length < 6 || linhas.some(l => l === '')) {
-    await client.sendMessage(user, '🚫 Dados incompletos ou com campos vazios. Por favor, envie todos os campos solicitados em uma única mensagem. Tente novamente.');
+    await client.sendMessage(user, '🚫 Dados incompletos ou com campos vazios. Por favor, envie todos os campos solicitados em uma única mensagem. Tente novamente.\n Pra voltar digite Menu ou digite 0️⃣');
     return;
   }
 
@@ -55,9 +55,9 @@ async function continuar(client, msg) {
 
   await client.sendMessage(destinatario, mensagem).catch(async err => {
     console.error('Erro ao enviar mensagem para atendente cadastro:', err);
-    await client.sendMessage(user, '❌ Ocorreu um erro ao enviar seu cadastro para o atendente. Por favor, tente novamente mais tarde.');
+    await client.sendMessage(user, '❌ Ocorreu um erro ao enviar seu cadastro para o atendente. Por favor, tente novamente mais tarde.\n Para voltar digite Menu ou digite 0️⃣');
   });
-  await client.sendMessage(user, '✅ Cadastro enviado com sucesso! Obrigado.');
+  await client.sendMessage(user, '✅ Cadastro enviado com sucesso! Obrigado.\n Para voltar digite Menu ou digite 0️⃣');
   console.log(`[controllerCadastro] clearStep antes chamado ${user}`);
   const user2 = msg.author;
   await flowControl.clearStep(user);

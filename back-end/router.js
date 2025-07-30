@@ -16,15 +16,51 @@ async function handleMessage(client, msg) {
   if (!msg.from.endsWith('@g.us')) return;
 
   const chat = await msg.getChat();
-  if (!chat.isGroup || chat.name !== 'BOT REI') return;
+  if (!chat.isGroup || chat.name !== 'BOT REI 3') return;
 
   const userId = msg.author || msg.from;
-  const text = msg.body?.toLowerCase().trim() || '';
+  //const text = msg.body?.toLowerCase().trim() || '';
+  let text = msg.body?.toLowerCase().trim() || '';
 
   const etapa = await flowControl.getStep(userId); // Corrigido: await para funcionar corretamente
 
   console.log(`Mensagem do grupo "${chat.name}" - Usuário: ${userId} - Texto: "${text}"`);
+  
+  // Atalho para voltar ao menu principal
+if (text === 'menu' || text === '0') {
+  await flowControl.clearStep(userId);
+  return client.sendMessage(
+    msg.from,
+    '🤖 Você voltou ao menu principal! Digite uma das opções abaixo:\n\n' +
+    '1️⃣ - Pedido\n' +
+    '2️⃣ - Pedido Chegou\n' +
+    '3️⃣ - Financeiro\n' +
+    '4️⃣ - Cadastro Cliente\n' +
+    '5️⃣ - Antecipado\n' +
+    '6️⃣ - Pós-Venda\n' +
+    '7️⃣ - Volume Danificado\n' +
+    '8️⃣ - Volume Faltou\n' +
+    '9️⃣ - Outros Assuntos'
+  );
+}
 
+  // 🔢 Mapeamento de opções numéricas para palavras-chave
+  const opcoesMenu = {
+    '1': 'pedido',
+    '2': 'pedido chegou',
+    '3': 'financeiro',
+    '4': 'cadastro cliente',
+    '5': 'antecipado',
+    '6': 'pós venda',
+    '7': 'volume danificado',
+    '8': 'volume faltou',
+    '9': 'outros assuntos'
+  };
+
+  if (opcoesMenu[text]) {
+    console.log(`[router.js] Entrada numérica detectada: ${text} => ${opcoesMenu[text]}`);
+    text = opcoesMenu[text];
+  }
   // 🔁 Fluxos ativos
   if (etapa?.startsWith('chegou')) {
     return controllerPedido.chegou(client, msg); // fluxo múltiplas etapas do "Pedido Chegou"
@@ -64,6 +100,11 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
   if (etapa === 'aguardando_comprovante_antecipado') {
     return controllerAntecipado.continuar(client, msg);
   }
+
+  if (etapa === 'AGUARDANDO_OPCAO_DEPOIS_DO_PEDIDO') {
+     return controllerPedido.iniciar(client, msg);
+  }
+  
   // 🎯 Gatilhos de entrada (menus principais)
 
   if (text.includes('pedido chegou')) {
@@ -111,10 +152,28 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
     return redirecionar(client, msg, 'outros', 'Outros Assuntos');
   }
 
+  // if (text === '10' || text === 'atendente') {
+  //   await flowControl.clearStep(userId);
+  //   return redirecionarAtendente(client, msg, 'atendimento'); // ou o parâmetro que seu redirecionarAtendente espera
+  // }
   // Fallback
+  // await client.sendMessage(
+  //   msg.from,
+  //   '🤖 Olá! Digite uma das palavras-chave \n para iniciar o seu atendimento  \n\n *Pedido* \n *Financeiro* \n *Cadastro Cliente* \n *Antecipado* \n *Pós-Venda* \n *Pedido Chegou* \n *Volume Danificado* \n *Volume Faltou* \n *Outros Assuntos*'
+  // );
+  // 📩 Fallback: se não reconheceu nenhuma palavra-chave
   await client.sendMessage(
     msg.from,
-    '🤖 Olá! Digite uma das palavras-chave \n para iniciar o seu atendimento  \n\n *Pedido* \n *Financeiro* \n *Cadastro Cliente* \n *Antecipado* \n *Pós-Venda* \n *Pedido Chegou* \n *Volume Danificado* \n *Volume Faltou* \n *Outros Assuntos*'
+    '🤖 Olá! Digite uma das opções para iniciar o seu atendimento:\n\n' +
+    '1️⃣ - Pedido\n' +
+    '2️⃣ - Pedido Chegou\n' +
+    '3️⃣ - Financeiro\n' +
+    '4️⃣ - Cadastro Cliente\n' +
+    '5️⃣ - Antecipado\n' +
+    '6️⃣ - Pós-Venda\n' +
+    '7️⃣ - Volume Danificado\n' +
+    '8️⃣ - Volume Faltou\n' +
+    '9️⃣ - Outros Assuntos'
   );
 }
 

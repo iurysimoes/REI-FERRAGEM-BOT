@@ -14,7 +14,7 @@ async function continuar(client, msg) {
   const user = msg.from;
 
   if (!msg.hasMedia) {
-    await client.sendMessage(user, '⚠️ Por favor, envie uma imagem ou PDF como comprovante.');
+    await client.sendMessage(user, '⚠️ Por favor, envie uma imagem ou PDF como comprovante para voltar digite Menu ou digite 0️⃣');
     return;
   }
 
@@ -38,13 +38,13 @@ async function continuar(client, msg) {
     await client.sendMessage(`${atendenteTel}@c.us`, mediaMsg, {
       caption: `📩 Novo comprovante de pagamento recebido do cliente ${user}`
     });
-    await client.sendMessage(user, '✅ Comprovante recebido com sucesso. Obrigado!');
+    await client.sendMessage(user, '✅ Comprovante recebido com sucesso. Obrigado!\n Para voltar digite Menu ou digite 0️⃣');
     const user2 = msg.author;
     await flowControl.clearStep(user);
     await flowControl.clearStep(user2);
   } catch (error) {
     console.error('Erro ao enviar comprovante para atendente:', error);
-    await client.sendMessage(user, '❌ Ocorreu um erro ao enviar seu comprovante. Tente novamente mais tarde.');
+    await client.sendMessage(user, '❌ Ocorreu um erro ao enviar seu comprovante. Tente novamente mais tarde.\n PAra voltar digite Menu ou digite 0️⃣');
   }
 }
 
