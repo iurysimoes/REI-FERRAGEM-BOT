@@ -1,5 +1,6 @@
 const oracledb = require('oracledb');
 const dbConfig = require('../config/db');
+require('dotenv').config();
 
 try {
   oracledb.initOracleClient({ libDir: 'C:/oracle/instantclient_21_3' }); // ajusta o caminho conforme teu ambiente
