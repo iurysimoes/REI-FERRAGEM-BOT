@@ -12,11 +12,11 @@ const NUMERO_FIXO = '556284315872';
 async function handleMessage(client, msg) {
   console.log('[router.js] Entrou na função handleMessage');
 
-  if (msg.fromMe) return;
-  if (!msg.from.endsWith('@g.us')) return;
+  if (msg.fromMe) return; //processa somente mensagens que Não são suas
+  if (!msg.from.endsWith('@g.us')) return;//se comentar responde conversas privadas normalmente
 
   const chat = await msg.getChat();
-  if (!chat.isGroup || chat.name !== 'BOT REI') return;
+  if (!chat.isGroup || chat.name !== 'BOT REI') return;//se comentar ele responde qualquer grupo
 
   const userId = msg.author || msg.from;
   //const text = msg.body?.toLowerCase().trim() || '';
