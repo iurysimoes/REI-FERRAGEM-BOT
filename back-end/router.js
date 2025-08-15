@@ -180,10 +180,14 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
     return redirecionar(client, msg, 'faltou', 'Volume Faltando');
   }
 
-   if (text.includes('crédito')) {
+  if (text.includes('crédito')) {
     return redirecionar(client, msg, 'credito', 'credito');
   }
 
+  if (text.includes('cadastro whatsapp')) {
+    return redirecionar(client, msg, 'cadastro whatsapp', 'cadastro whatsapp');
+  }
+  
    if (text.includes('st')) {
     return redirecionar(client, msg, 'st', 'st');
   }
