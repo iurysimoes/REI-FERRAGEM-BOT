@@ -13,7 +13,8 @@ Por favor, envie as seguintes informações em uma única mensagem, separadas po
 3️⃣ CNPJ/CPF
 4️⃣ Inscrição Estadual
 5️⃣ Telefone
-6️⃣ CEP`;
+6️⃣ CEP
+0️⃣ Menu principal`;
 
   await client.sendMessage(user, instrucoes);
   await flowControl.setStep(user, 'aguardando_dados_cadastro');

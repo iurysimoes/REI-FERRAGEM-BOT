@@ -21,6 +21,14 @@ const client = new Client({
   authStrategy: new LocalAuth(),
 });
 
+// registra listener só uma vez
+if (!global.listenerRegistrado) {
+  client.on('message', async (msg) => {
+    await handleMessage(client, msg);
+  });
+  global.listenerRegistrado = true;
+}
+
 const qrcode = require('qrcode-terminal');
 
 client.on('qr', (qr) => {
@@ -37,11 +45,11 @@ client.on('ready', () => {
     verificarNovosPedidos(client);
   }, 10000); // 10 segundos
 });
-client.on('message', async (msg) => {
+//client.on('message', async (msg) => {
   //console.log('[index.js] Mensagem recebida:', msg); // 👈 coloca isso
   //console.log('Nome do grupo:', chat.name);
-  await handleMessage(client, msg);
-});
+  //await handleMessage(client, msg);
+//});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

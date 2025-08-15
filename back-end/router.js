@@ -9,9 +9,39 @@ const { redirecionar } = require('./controllers/controllerRedirecionamento');
 const flowControl = require('./flowcontrol');
 const NUMERO_FIXO = '556284315872';
 
+
+if (!global.inatividadeTimers) {
+  global.inatividadeTimers = {};
+}
+
+// função pra resetar o timer de um usuário
+function resetarTimerInatividade(userId, client, msg) {
+  // se já existir um timer pra esse usuário, apaga
+  if (global.inatividadeTimers[userId]) {
+    clearTimeout(global.inatividadeTimers[userId]);
+  }
+
+  // cria novo timer de 2 minutos (120000 ms)
+  global.inatividadeTimers[userId] = setTimeout(async () => {
+    console.log(`[inatividade] Encerrando conversa com ${userId} por inatividade`);
+
+    // limpa o passo do usuário no flowControl
+    await flowControl.clearStep(userId);
+
+    // envia mensagem de encerramento
+    await client.sendMessage(
+      msg.from,
+      '⏱️ Conversa encerrada por falta de comunicação.\n Digite *menu* para começar novamente.'
+    );
+
+    // remove o timer da memória
+    delete global.inatividadeTimers[userId];
+  }, 120000); // 2 minutos
+}
+
 async function handleMessage(client, msg) {
   console.log('[router.js] Entrou na função handleMessage');
-
+  
   if (msg.fromMe) return; //processa somente mensagens que Não são suas
   if (msg.from.endsWith('@g.us')) return;//se comentar responde conversas privadas normalmente
 
@@ -19,6 +49,7 @@ async function handleMessage(client, msg) {
   //if (!chat.isGroup || chat.name !== 'BOT REI') return;//se comentar ele responde qualquer grupo
 
   const userId = msg.author || msg.from;
+  resetarTimerInatividade(userId, client, msg);
   //const text = msg.body?.toLowerCase().trim() || '';
   let text = msg.body?.toLowerCase().trim() || '';
 
@@ -27,7 +58,7 @@ async function handleMessage(client, msg) {
   console.log(`Mensagem do grupo "${chat.name}" - Usuário: ${userId} - Texto: "${text}"`);
   
   // Atalho para voltar ao menu principal
-if (text === 'menu' || text === '0') {
+if (text === 'menu' || text === '0' || text === 'olá') {
   await flowControl.clearStep(userId);
   return client.sendMessage(
     msg.from,
@@ -107,7 +138,7 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
   
   // 🎯 Gatilhos de entrada (menus principais)
 
-  if (text.includes('pedido chegou')) {
+  if (text.includes('pedido chegou') || text.includes('conferência')) {
     console.log('chamou pedido chegou');
     //await flowControl.setStep(userId, 'chegou_menu');
     return controllerPedido.chegou(client, msg);
@@ -120,7 +151,8 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
     return controllerPedido.iniciar(client, msg);
   }
 
-  if (text.includes('financeiro')) {
+  //if (text.includes('financeiro')) {
+  if (text.includes('financeiro') || text.includes('credito')) {
     console.log('[router.js] Fluxo financeiro iniciado. Etapa setada para financeiro_menu');
     await flowControl.setStep(userId, 'financeiro_menu');
     return controllerFinanceiro.iniciar(client, msg);
@@ -131,12 +163,12 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
     return controllerAntecipado.iniciar(client, msg);
   }
   
-  if (text.includes('cadastro cliente')) {
+  if (text.includes('cadastro') || text.includes('cadastrar whatsapp') ) {
     await flowControl.setStep(userId, 'aguardando_dados_cadastro'); // já define aqui també
     return controllerCadastro.iniciar(client, msg);
   }
 
-  if (text.includes('pós venda') || text.includes('pos venda')) {
+  if (text.includes('pós-venda') || text.includes('pos venda') || text.includes('pós venda')) {
     return redirecionar(client, msg, 'posvenda', 'Pós-Venda');
   }
 
@@ -148,6 +180,13 @@ if (etapa === 'financeiro_menu' || etapa === 'financeiro_pos_boleto'){
     return redirecionar(client, msg, 'faltou', 'Volume Faltando');
   }
 
+   if (text.includes('crédito')) {
+    return redirecionar(client, msg, 'credito', 'credito');
+  }
+
+   if (text.includes('st')) {
+    return redirecionar(client, msg, 'st', 'st');
+  }
   if (text.includes('outros assuntos')) {
     return redirecionar(client, msg, 'outros', 'Outros Assuntos');
   }

@@ -21,3 +21,6 @@ npm-debug.log*
 
 # Arquivos temporários
 *.tmp
+.wwebjs_cache/2.3000.1024849293.html
+.wwebjs_cache/2.3000.1024851310.html
+.wwebjs_cache/2.3000.1024854719.html
