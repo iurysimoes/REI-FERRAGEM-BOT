@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('./database/db');
 
-router.post('api/validar-volume', async (req, res) => {
+router.post('/validar-volume', async (req, res) => {
   const { idPedido, codigoBarras, userId } = req.body;
 
   if (!idPedido || !codigoBarras) {
