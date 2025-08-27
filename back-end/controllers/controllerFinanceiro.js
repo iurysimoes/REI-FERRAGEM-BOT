@@ -55,7 +55,7 @@ async function processarNF(client, msg) {
 
   // Verifica se é um número válido
   if (!/^\d+$/.test(nfTexto)) {
-    await msg.reply('❌ Por favor, envie apenas o número da nota fiscal (somente números).');
+    await msg.reply('❌ Por favor, envie apenas o número da nota fiscal (somente números) Ou digite 0 para Voltar ao Menu');
     return;
   }
 
