@@ -150,13 +150,14 @@ async function chegou(client, msg) {
 
       await flowControl.clearStep(userId);
 
-      const baseUrl = 'https://seuservidor.com'; // Substituir pelo seu domínio real ou ngrok
+      const baseUrl = 'http://localhost:3001'; // Substituir pelo seu domínio real ou ngrok
       const url = `${baseUrl}/index.html?idPedido=${encodeURIComponent(numeroPedido)}&userId=${encodeURIComponent(userId)}`;
       
       return client.sendMessage(
         msg.from,
         `📦 Beleza! Agora clique no link abaixo para escanear os volumes do pedido.\n\n` +
-        `👉 https://rei-ferragem-bot.vercel.app/?userId=${userId}&idPedido=${numeroPedido}\n\n` +
+        //`👉 https://rei-ferragem-bot.vercel.app/?userId=${userId}&idPedido=${numeroPedido}\n\n` +
+        `👉 ${url}\n\n` +
         `📸 Quando terminar de escanear, clique no botão "Finalizar Escaneamento" que vai te redirecionar pro WhatsApp.`
       );
       

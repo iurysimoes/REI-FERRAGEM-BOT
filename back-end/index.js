@@ -11,8 +11,16 @@ const { verificarNovosPedidos } = require('./controllers/controllerNotificacoes'
 // ou, se quiser liberar só pra um domínio específico (mais seguro):
  app.use(cors({ origin: 'https://rei-ferragem-bot.vercel.app' }));
 
+//app.use(express.static(path.join(__dirname, 'public')));
+
+
 app.use(express.json()); // pra conseguir ler JSON no body das requisições
 app.use(express.static(path.join(__dirname, 'public')));
+
+// app.get('/', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../public/index.html'));
+// });
+
 
 app.use('/', routesVolumes);
 //app.use('/api', routesVolumes);
