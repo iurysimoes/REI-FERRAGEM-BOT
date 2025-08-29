@@ -182,7 +182,7 @@ async function startScanner() {
           // O usuário decidirá quando parar usando o botão de finalizar
 
         } catch (fetchError) {
-          displayMessage('Erro ao comunicar com o servidor.' + fetchError.message, 'error');
+          displayMessage('Erro ao comunicar com o servidor.' + 'http://45.164.251.84:3001/validar-volume', 'error');
         } finally {
           loadingIndicator.style.display = 'none';
         }
