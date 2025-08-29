@@ -92,7 +92,6 @@
   }
   </style>
   <button id="finish-button">Finalizar Escaneamento</button>
-  <button id="teste-button" onclick="() => {alert('teste')}">Teste butt</button>
   <div id="check-sucesso" style="display: none; font-size: 100px; color: green;">✅</div>
   <script>
     const codeReader = new ZXing.BrowserBarcodeReader();
@@ -155,7 +154,7 @@ async function startScanner() {
           // const res = await fetch('https://84c018df3bfe.ngrok-free.app/validar-volume', {
           //const res = await fetch('http://10.1.1.110:3001/validar-volume', {
           
-          const res = await fetch('http://45.164.251.84:3001/validar-volume', {
+          const res = await fetch('https://45.164.251.84:3001/validar-volume', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idPedido, codigoBarras: codigo, userId: userId })
