@@ -151,7 +151,8 @@ async function startScanner() {
         displayMessage('Código detectado: ' + codigo, 'info');
 
         try {
-          const res = await fetch('https://84c018df3bfe.ngrok-free.app/validar-volume', {
+          // const res = await fetch('https://84c018df3bfe.ngrok-free.app/validar-volume', {
+          const res = await fetch('http://10.1.1.110:3001/validar-volume', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idPedido, codigoBarras: codigo, userId: userId })
@@ -208,7 +209,7 @@ finishButton.addEventListener('click', () => {
   // Tenta fechar a aba/navegador
   //window.close(); nao funciona quando navegador e aberto via link
   // Redireciona para o WhatsApp
-  window.location.href = 'https://wa.me/5562985119035';//colocar numero que vai abrir direto na conversa do bot.
+  window.location.href = 'https://wa.me/5562999806554';//colocar numero que vai abrir direto na conversa do bot.
  
 }); 
 

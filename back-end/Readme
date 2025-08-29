@@ -3,7 +3,10 @@
 Bot de atendimento automatizado via WhatsApp, usando a API [whatsapp-web.js](https://wwebjs.dev/) e banco de dados Oracle.
 
 ---
-
+--IMPORTANTE
+# mudar o .env para base desenvolvimento
+# mudar ip fixo no index.html e usar ngrok novamente para testes.
+--FIM
 ## 📁 Estrutura do Projeto
 ```
 back-end/
