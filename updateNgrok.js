@@ -14,7 +14,12 @@ async function run() {
     let indexHtml = fs.readFileSync(indexPath, "utf-8");
 
     // 3️⃣ Substitui placeholder pela nova URL
-    const newIndexHtml = indexHtml.replace(/NGROK_URL_PLACEHOLDER/g, url);
+    //const newIndexHtml = indexHtml.replace(/NGROK_URL_PLACEHOLDER/g, url);
+    // Substitui qualquer URL ngrok anterior
+    const newIndexHtml = indexHtml.replace(
+      /https:\/\/[a-z0-9]+\.ngrok-free\.app/g,
+      url
+    );
     fs.writeFileSync(indexPath, newIndexHtml);
     console.log("✅ index.html atualizado com a nova URL!");
 
