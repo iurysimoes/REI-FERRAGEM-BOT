@@ -4,7 +4,9 @@
   "description": "Chatbot WhatsApp com atendimento automatizado e integração com Oracle.",
   "main": "back-end/index.js",
   "scripts": {
-    "start": "node back-end/index.js"
+    "start": "node back-end/index.js",
+    "ngrok:update": "node updateNgrok.js",
+    "dev": "concurrently \"npm start\" \"npm run ngrok:update\""
   },
   "dependencies": {
     "boleto-pdf": "^0.4.0",
