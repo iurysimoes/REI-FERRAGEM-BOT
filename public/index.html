@@ -151,9 +151,11 @@ async function startScanner() {
         displayMessage('Código detectado: ' + codigo, 'info');
 
         try {
-          const API_URL = "https://01126215801e.ngrok-free.app";
+          const API_URL = "https://0131287d2eb7.ngrok-free.app";
            /*teste*/
-           const res = await fetch(`${API_URL}/validar-volume`, { // 👈 template literal com crase
+           //const res = await fetch(`${API_URL}/validar-volume`, { // 👈 template literal com crase
+           const res = await fetch(`45.164.251.84:3001/validar-volume`, { // 👈 template literal com crase
+
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idPedido, codigoBarras: codigo, userId: userId })
