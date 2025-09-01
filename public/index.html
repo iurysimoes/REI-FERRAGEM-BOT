@@ -151,7 +151,7 @@ async function startScanner() {
         displayMessage('Código detectado: ' + codigo, 'info');
 
         try {
-          const API_URL = "https://bdc41c30ce45.ngrok-free.app";
+          const API_URL = "NGROK_URL_PLACEHOLDER";
 
           //const res = await fetch('${API_URL}/validar-volume', {
           const res = await fetch(`${API_URL}/validar-volume`, { // 👈 template literal com crase
