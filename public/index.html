@@ -142,16 +142,16 @@ async function startScanner() {
       if (result) {
         const codigo = result.text;
         // Evitar processar o mesmo código repetidamente
-        if (codigosLidos.includes(codigo)) {
+        /*if (codigosLidos.includes(codigo)) {
           displayMessage(`Código ${codigo} já foi escaneado.`, 'info');
           return;
-        }
+        }*/
 
         loadingIndicator.style.display = 'block';
-        /*displayMessage('Código detectado: ' + codigo, 'info');*/
+        displayMessage('Código detectado e conferido', 'info');
 
         try {
-          const API_URL = "https://89d0e8406d32.ngrok-free.app";
+          const API_URL = "https://8ef66109873f.ngrok-free.app";
            /*teste*/
            const res = await fetch(`${API_URL}/validar-volume`, { // 👈 template literal com crase
             method: 'POST',
