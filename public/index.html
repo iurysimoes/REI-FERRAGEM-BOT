@@ -151,7 +151,7 @@ async function startScanner() {
         displayMessage('Código detectado: ' + codigo, 'info');
 
         try {
-          const API_URL = "https://599faf2270e2.ngrok-free.app";
+          const API_URL = "https://4441cb7f1c09.ngrok-free.app";
            /*teste*/
            const res = await fetch(`${API_URL}/validar-volume`, { // 👈 template literal com crase
             method: 'POST',
@@ -160,11 +160,11 @@ async function startScanner() {
           });
           const data = await res.json();
  
-          codigosLidos.push(codigo); // Adiciona o código à lista de lidos
+          /*codigosLidos.push(codigo); // Adiciona o código à lista de lidos
           displayMessage(
             `${data.mensagem} (Códigos lidos: ${codigosLidos.length})`,
             data.sucesso ? 'success' : 'error'
-          );
+          );*/
           // Se todos os volumes foram conferidos, exibe mensagem e oculta scanner
           if (data.todosVolumesConferidos) {
             scanning = false;
