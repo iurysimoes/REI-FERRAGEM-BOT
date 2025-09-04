@@ -151,7 +151,7 @@ async function startScanner() {
         displayMessage('Código detectado e conferido', 'info');
 
         try {
-          const API_URL = "https://00b1bce679bb.ngrok-free.app";
+          const API_URL = "https://7e694ee080d9.ngrok-free.app";
            /*teste*/
            const res = await fetch(`${API_URL}/validar-volume`, { // 👈 template literal com crase
             method: 'POST',
@@ -160,7 +160,7 @@ async function startScanner() {
           });
           const data = await res.json();
  
-          /*codigosLidos.push(codigo); // Adiciona o código à lista de lidos
+          codigosLidos.push(codigo); // Adiciona o código à lista de lidos
           displayMessage(
             `${data.mensagem} (Códigos lidos: ${codigosLidos.length})`,
             data.sucesso ? 'success' : 'error'
